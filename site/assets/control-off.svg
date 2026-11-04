@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="270" viewBox="0 0 1000 270" role="img" aria-labelledby="title desc">
+  <title id="title">无控制系统</title><desc id="desc">基座扰动作用于平台，响应经过测量环节，再叠加测量噪声形成含噪输出。控制命令为零。</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="#667269"/></marker></defs>
+  <g fill="none" stroke="#667269" stroke-width="1.5" marker-end="url(#arrow)"><path d="M166 144H245"/><path d="M397 144H464"/><path d="M620 144H690"/><path d="M730 144H802"/><path d="M710 71V123"/><path d="M320 219V176"/></g>
+  <g fill="#fafaf8" stroke="#a9b2a9"><rect x="25" y="112" width="141" height="64" rx="2"/><rect x="245" y="112" width="152" height="64" rx="2"/><rect x="464" y="112" width="156" height="64" rx="2"/><rect x="802" y="112" width="169" height="64" rx="2"/></g>
+  <circle cx="710" cy="144" r="20" fill="#fff" stroke="#667269" stroke-width="1.5"/>
+  <g font-family="system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif" text-anchor="middle" fill="#263c2e" font-size="21"><text x="95" y="153">基座扰动</text><text x="321" y="153">平台模型</text><text x="542" y="153">测量环节</text><text x="886" y="153">含噪测量输出</text><text x="710" y="153" font-size="29">+</text><text x="710" y="53" font-size="18" fill="#68716b">测量噪声</text><text x="320" y="245" font-size="18" fill="#68716b">控制命令 = 0</text></g>
+</svg>

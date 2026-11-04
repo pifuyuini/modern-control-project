@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="390" viewBox="0 0 1000 390" role="img" aria-labelledby="title desc">
+  <title id="title">闭环控制系统</title><desc id="desc">含噪测量输出与零参考形成误差，经控制器和执行器接口反馈作用于平台。基座扰动与测量噪声分别进入系统。</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10" fill="#667269"/></marker><marker id="green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10" fill="#2e594a"/></marker></defs>
+  <g fill="none" stroke="#667269" stroke-width="1.5" marker-end="url(#arrow)"><path d="M166 125H245"/><path d="M397 125H464"/><path d="M620 125H690"/><path d="M730 125H802"/><path d="M710 60V104"/></g>
+  <g fill="#fafaf8" stroke="#a9b2a9"><rect x="25" y="93" width="141" height="64" rx="2"/><rect x="245" y="93" width="152" height="64" rx="2"/><rect x="464" y="93" width="156" height="64" rx="2"/><rect x="802" y="93" width="169" height="64" rx="2"/></g>
+  <circle cx="710" cy="125" r="20" fill="#fff" stroke="#667269" stroke-width="1.5"/>
+  <g fill="none" stroke="#2e594a" stroke-width="1.7" marker-end="url(#green)"><path d="M771 125V282H730"/><path d="M690 282H614"/><path d="M462 282H397"/><path d="M245 282H205V193H321V158"/><path d="M710 214V261"/></g>
+  <circle cx="771" cy="125" r="3" fill="#2e594a"/><circle cx="710" cy="282" r="20" fill="#fff" stroke="#2e594a" stroke-width="1.5"/>
+  <g fill="#f1f5ef" stroke="#2e594a"><rect x="462" y="250" width="152" height="64" rx="2"/><rect x="245" y="250" width="152" height="64" rx="2"/></g>
+  <g font-family="system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif" text-anchor="middle" fill="#263c2e" font-size="21"><text x="95" y="134">基座扰动</text><text x="321" y="134">平台模型</text><text x="542" y="134">测量环节</text><text x="886" y="134">含噪测量输出</text><text x="710" y="134" font-size="29">+</text><text x="710" y="43" font-size="18" fill="#68716b">测量噪声</text><text x="538" y="278">反馈控制器</text><text x="538" y="300" font-size="13">待设计</text><text x="321" y="291">执行器接口</text><text x="710" y="202" font-size="17">参考信号 = 0</text><text x="710" y="290" font-size="27">Σ</text><text x="747" y="269" font-size="22">−</text><text x="690" y="244" font-size="18">+</text></g>
+</svg>

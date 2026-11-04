@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fafaf8">
+  <meta name="description" content="控制课程大作业：以六自由度主动隔振平台 Model-1019 为对象，开展专题文献调研、系统分析、SISO 与 MIMO 控制器设计及闭环性能评价。">
+  <title>六自由度主动隔振平台 · 控制课程大作业</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳转到作业正文</a>
+  <header class="site-header">
+    <a class="wordmark" href="#top" aria-label="控制课程大作业，返回顶部"><span class="brand-mark" aria-hidden="true">m<span>c</span></span><span>控制课程大作业</span></a>
+    <a class="header-download" href="downloads/model1019_coursework_v1.zip" download>下载教学包 <span aria-hidden="true">↓</span></a>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="top" aria-labelledby="page-title">
+      <p class="eyebrow">COURSE PROJECT / MODEL-1019</p>
+      <h1 id="page-title">六自由度主动隔振平台<br><span>反馈控制设计</span></h1>
+      <div class="hero-bottom">
+        <div class="hero-description">
+          <p>以给定平台模型为被控对象，完成专题文献调研、系统分析、单通道与多变量控制器设计，并通过统一的闭环仿真评价控制性能。</p>
+          <a class="button" href="downloads/model1019_coursework_v1.zip" download>下载作业材料 <span aria-hidden="true">↗</span></a>
+          <span class="download-meta">ZIP · v1.0 · 72 KB</span>
+        </div>
+        <dl class="hero-stats" aria-label="模型规模">
+          <div><dt>状态</dt><dd>20</dd></div>
+          <div><dt>输入</dt><dd>12</dd></div>
+          <div><dt>输出</dt><dd>06</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="document-layout">
+      <aside class="contents">
+        <nav aria-label="页面目录">
+          <p class="contents-label">作业说明</p>
+          <a href="#background"><span>01</span>项目背景</a>
+          <a href="#literature"><span>02</span>专题文献调研</a>
+          <a href="#model"><span>03</span>被控对象与接口</a>
+          <a href="#simulation"><span>04</span>仿真系统说明</a>
+          <a href="#design"><span>05</span>控制器设计任务</a>
+          <a href="#evaluation"><span>06</span>控制性能评价</a>
+          <a href="#materials"><span>07</span>材料与使用方法</a>
+        </nav>
+      </aside>
+
+      <article class="document">
+        <section id="background" class="document-section" aria-labelledby="background-title">
+          <div class="section-heading"><span class="section-number">01</span><h2 id="background-title">项目背景</h2></div>
+          <p class="section-lead">精密工程中的微小振动，是一个需要兼顾动力学、测量与反馈控制的问题。</p>
+          <h3>应用背景与隔振需求</h3>
+          <p>在精密测量、光学实验和高精度加工等场景中，地面的微小振动会通过支撑结构传递到仪器或工作平台，影响测量结果和设备性能。因此，如何减小外界振动对平台运动的影响，是精密工程中的一个重要控制问题。</p>
+          <p>在没有主动控制时，平台依靠悬挂结构实现被动隔振，但在固有频率附近可能出现明显的共振响应。主动控制利用传感器测得的运动信息，实时计算执行器命令，为平台提供附加阻尼并抑制振动。本作业主要关注 0.1–10 Hz 频段内的低频振动控制。</p>
+          <h3>六自由度主动隔振平台</h3>
+          <p>本作业的研究对象是一套六自由度主动隔振平台。平台通过三个悬挂片与基座连接，其运动包括沿三个坐标轴的平动，以及绕三个坐标轴的转动。系统配置三个水平音圈电机和三个竖直音圈电机，用于主动施加控制作用；通过安装在平台上的三只三轴惯性速度传感器获取运动信息，共形成九路原始测量信号。</p>
+          <p>该系统的控制难点在于多个运动方向之间存在耦合：一个执行器的作用可能同时引起多个方向的响应，而某一路传感器信号也可能包含不同运动分量。控制器设计需要考虑完整系统的相互作用，在保证闭环稳定的前提下，权衡振动抑制效果与控制输入大小。</p>
+        </section>
+
+        <section id="literature" class="document-section" aria-labelledby="literature-title">
+          <div class="section-heading"><span class="section-number">02</span><h2 id="literature-title">第一部分 · 专题文献调研</h2></div>
+          <p class="section-lead">以小组为单位，从以下四个主题中任选一个，开展深入文献调研。</p>
+          <p>围绕所选主题了解研究现状、代表性方法与工程应用，形成专题调研报告。调研应体现归纳、比较和分析，并联系主动隔振平台的控制问题说明所得启示。</p>
+          <div class="topic-list">
+            <section class="topic"><span class="topic-index">A</span><div><h3>平台构型与布局</h3><p>调研典型主动隔振平台的结构形式，包括自由度配置、支撑或悬挂方式、执行器与传感器的选型及空间布局。比较不同方案的特点，分析结构与布局对平台运动、测量和控制实现的影响。</p></div></section>
+            <section class="topic"><span class="topic-index">B</span><div><h3>动力学与控制性能</h3><p>调研平台的动力学特性，重点关注固有频率、阻尼、模态及多自由度耦合，分析这些特性对闭环稳定性、控制带宽和振动抑制效果的影响。结合具体模型，讨论右半平面零点等非最小相位特征的产生条件及其带来的控制性能限制。</p></div></section>
+            <section class="topic"><span class="topic-index">C</span><div><h3>低频测量与传感器融合</h3><p>调研惯性传感器在低频测量中的性能局限及其对主动隔振效果的影响。进一步研究惯性测量与相对位移等互补测量信号的融合方案，比较其融合原理、频带分工、参数选择及适用条件。</p></div></section>
+            <section class="topic"><span class="topic-index">D</span><div><h3>先进控制算法</h3><p>调研适用于主动隔振平台的先进控制方法，介绍其基本原理、控制结构及模型与测量信息需求。比较不同方法的性能特点、鲁棒性和实现难度，结合本作业对象提出候选控制方案及选择理由。</p></div></section>
+          </div>
+          <div class="note"><strong>调研成果</strong><p>每组提交一份所选主题的文献调研报告，包含研究现状梳理、代表性方案比较、适用条件与局限分析，以及对本作业的启示，并规范标注文献来源。</p></div>
+        </section>
+
+        <section id="model" class="document-section" aria-labelledby="model-title">
+          <div class="section-heading"><span class="section-number">03</span><h2 id="model-title">第二部分 · 被控对象与模型接口</h2></div>
+          <p class="section-lead">Model-1019：连续时间线性系统，20 个状态、12 个输入、6 个输出。</p>
+          <p>本部分采用 Model-1019 作为控制器设计与闭环仿真的被控对象。模型描述平台在控制命令和基座运动共同作用下的小幅运动响应，并包含测量环节的动态影响。模型已进行固定的输入输出坐标变换，具体数值以教学包中的 <code>data/model1019.mat</code> 为准。</p>
+          <div class="equation" aria-label="状态方程：Z 的时间导数等于 A Z 加 B U。无附加噪声输出等于 C Z 加 D U。">
+            <div><span class="math-variable">Ż</span> = <span class="math-variable">AZ + BU</span></div>
+            <div><span class="math-variable">y</span><sub>clean</sub> = <span class="math-variable">CZ + DU</span></div>
+            <p><span class="math-variable">U</span> 由 6 路控制命令与 6 路基座运动组成</p>
+          </div>
+          <p>矩阵 <code>A</code> 为 20 × 20，<code>B</code> 为 20 × 12，<code>C</code> 为 6 × 20，<code>D</code> 为 6 × 12。<code>B</code> 的前六列对应控制输入，后六列对应基座扰动。使用时完整保留教学包给出的矩阵与接口约定。</p>
+
+          <h3>状态组成</h3>
+          <div class="table-scroll" role="region" aria-label="模型状态组成" tabindex="0"><table><thead><tr><th scope="col">状态类别</th><th scope="col">数量</th><th scope="col">含义</th></tr></thead><tbody>
+            <tr><th scope="row">位移与转角状态</th><td>6</td><td>描述平台三个方向的平动和绕三个坐标轴的转动</td></tr>
+            <tr><th scope="row">辅助速度状态</th><td>6</td><td>描述机械运动与基座扰动共同作用下的内部动态</td></tr>
+            <tr><th scope="row">倾角记忆状态</th><td>2</td><td>描述平台倾斜对水平惯性测量的动态影响</td></tr>
+            <tr><th scope="row">测量滤波状态</th><td>6</td><td>描述六路测量信号的等效低通动态</td></tr>
+          </tbody></table></div>
+          <p>辅助速度状态不能直接等同于平台真实速度。模型内部状态、传感器测量量和机械运动评价量，应按照教学包使用手册中的接口定义使用。</p>
+
+          <h3>十二路输入</h3>
+          <p>输入按“六路控制命令在前、六路基座运动在后”的顺序排列。前六路由控制器计算，后六路由扰动信号给定。</p>
+          <div class="table-scroll" role="region" aria-label="十二路输入定义" tabindex="0"><table class="channel-table"><thead><tr><th scope="col">通道</th><th scope="col">名称</th><th scope="col">含义</th><th scope="col">单位</th></tr></thead><tbody>
+            <tr><td>1</td><th scope="row"><code>u_x</code></th><td>X 方向虚拟控制命令</td><td>命令量</td></tr>
+            <tr><td>2</td><th scope="row"><code>u_y</code></th><td>Y 方向虚拟控制命令</td><td>命令量</td></tr>
+            <tr><td>3</td><th scope="row"><code>u_z</code></th><td>Z 方向虚拟控制命令</td><td>命令量</td></tr>
+            <tr><td>4</td><th scope="row"><code>u_LRx</code></th><td>绕 X 轴的虚拟控制命令</td><td>命令量</td></tr>
+            <tr><td>5</td><th scope="row"><code>u_LRy</code></th><td>绕 Y 轴的虚拟控制命令</td><td>命令量</td></tr>
+            <tr><td>6</td><th scope="row"><code>u_LRz</code></th><td>绕 Z 轴的虚拟控制命令</td><td>命令量</td></tr>
+            <tr class="group-start"><td>7</td><th scope="row"><code>base_x</code></th><td>基座 X 方向位移</td><td>m</td></tr>
+            <tr><td>8</td><th scope="row"><code>base_y</code></th><td>基座 Y 方向位移</td><td>m</td></tr>
+            <tr><td>9</td><th scope="row"><code>base_z</code></th><td>基座 Z 方向位移</td><td>m</td></tr>
+            <tr><td>10</td><th scope="row"><code>base_theta_x</code></th><td>基座绕 X 轴转角</td><td>rad</td></tr>
+            <tr><td>11</td><th scope="row"><code>base_theta_y</code></th><td>基座绕 Y 轴转角</td><td>rad</td></tr>
+            <tr><td>12</td><th scope="row"><code>base_theta_z</code></th><td>基座绕 Z 轴转角</td><td>rad</td></tr>
+          </tbody></table></div>
+          <div class="note"><strong>以教学包的外部接口为准</strong><p>教学包已经完成转动通道的单位换算。基座输入直接使用 m 和 rad，测量输出直接使用 m/s 和 rad/s，无需再次乘除参考长度。控制命令仍按模型定义的命令量使用。</p></div>
+
+          <h3>六路输出</h3>
+          <div class="table-scroll" role="region" aria-label="六路输出定义" tabindex="0"><table class="channel-table"><thead><tr><th scope="col">通道</th><th scope="col">名称</th><th scope="col">含义</th><th scope="col">单位</th></tr></thead><tbody>
+            <tr><td>1</td><th scope="row"><code>vx_apparent</code></th><td>X 方向表观速度测量</td><td>m/s</td></tr>
+            <tr><td>2</td><th scope="row"><code>vy_apparent</code></th><td>Y 方向表观速度测量</td><td>m/s</td></tr>
+            <tr><td>3</td><th scope="row"><code>vz</code></th><td>Z 方向速度测量</td><td>m/s</td></tr>
+            <tr><td>4</td><th scope="row"><code>omega_x</code></th><td>绕 X 轴的角速度测量</td><td>rad/s</td></tr>
+            <tr><td>5</td><th scope="row"><code>omega_y</code></th><td>绕 Y 轴的角速度测量</td><td>rad/s</td></tr>
+            <tr><td>6</td><th scope="row"><code>omega_z</code></th><td>绕 Z 轴的角速度测量</td><td>rad/s</td></tr>
+          </tbody></table></div>
+          <p>六路输出均包含测量滤波动态，其中水平 X、Y 两路还包含倾角影响。输入输出坐标变换便于按六个运动方向组织控制，但模型仍保留动态耦合。系统分析和闭环验证应以完整模型为依据。</p>
+        </section>
+
+        <section id="simulation" class="document-section" aria-labelledby="simulation-title">
+          <div class="section-heading"><span class="section-number">04</span><h2 id="simulation-title">仿真系统说明</h2></div>
+          <p class="section-lead">分别观察平台的机械运动与含噪测量，在一致的条件下比较控制效果。</p>
+          <h3>无控制系统与基准响应</h3>
+          <p>无控制系统对应主动反馈关闭、执行器不施加附加控制作用的工况。平台依靠自身支撑结构提供刚度和阻尼，其运动主要由外界扰动及初始状态决定。该工况用于建立闭环控制效果的比较基准。</p>
+          <figure class="system-figure"><img src="assets/control-off.svg" width="1000" height="270" loading="lazy" alt="无控制信号路径：基座扰动作用于平台模型，平台响应经过测量环节，再叠加测量噪声形成含噪输出；控制命令为零。"><figcaption>Control off · 执行器命令为零，测量噪声在输出端加入。</figcaption></figure>
+          <p>地面运动通过基座和悬挂结构传递至平台，引起平动与转动响应。平台运动经过传感测量环节形成输出信号，测量过程中同时受到传感器噪声的影响。在主动反馈关闭时，附加测量噪声会影响观测结果，但不会通过控制器和执行器进一步作用于平台。</p>
+          <p>平台机械运动用于描述模型中的振动状态，传感器测量输出用于描述控制器能够获得的信息。通过分析无控制工况下的时域响应和频谱，可以了解主要振动频段、共振响应及不同运动方向之间的联系。</p>
+          <h3>闭环控制系统</h3>
+          <p>闭环系统在平台与测量模型的基础上加入反馈控制器。传感器测得的平台运动信息传入控制器，控制器根据测量偏差计算命令，再由执行器对平台施加作用，形成反馈回路。图示参考信号取零，具体采样与执行接口以所采用的仿真实现为准。</p>
+          <figure class="system-figure"><img src="assets/closed-loop.svg" width="1000" height="390" loading="lazy" alt="闭环信号路径：含噪测量输出与零参考形成误差，经待设计控制器及执行器接口作用于平台；基座扰动和测量噪声分别进入系统。"><figcaption>Control on · 控制器接收含噪测量，噪声也可能经反馈作用于平台。</figcaption></figure>
+          <p>平台不同运动方向之间存在动态耦合，一个通道的控制作用可能影响其他通道。控制器设计需要考虑完整多输入多输出系统的相互作用，闭环稳定性与性能也应在完整系统上验证。</p>
+          <p>闭环中的测量噪声不仅影响传感器读数，还可能经控制器产生执行器命令，进而影响平台运动。控制器设计需要在扰动抑制、测量噪声影响和控制输入大小之间作出合理取舍。反馈测量的幅值下降，也需要结合模型中的机械运动加以解释。</p>
+          <p>比较无控制与闭环工况时，保持外界扰动、测量噪声、初始条件和分析设置一致，考察目标频段内的振动变化、其他频段的响应变化，以及获得相应抑振效果所需的控制输入。</p>
+        </section>
+
+        <section id="design" class="document-section" aria-labelledby="design-title">
+          <div class="section-heading"><span class="section-number">05</span><h2 id="design-title">控制器设计任务</h2></div>
+          <p class="section-lead">依次完成模型分析、FZ → Z 单通道设计和完整 MIMO 系统设计。</p>
+          <ol class="task-list">
+            <li><h3>模型分析</h3><p>基于六路控制输入和六路测量输出，分析系统的可控性与可观性。结合极点、零点及通道耦合特性，讨论模型对控制性能的影响与限制。</p><p>可控性分析使用模型中对应控制命令的输入矩阵，即 <code>B</code> 的前六列；后六列为外部基座扰动。报告应说明所用分析方法、主要结果，以及这些结果对后续控制器设计的启示。</p></li>
+            <li><h3>单通道控制器设计：FZ → Z</h3><p>针对 FZ → Z 通道设计反馈控制器，说明设计依据和参数选择过程，绘制灵敏度函数的频率响应，并结合闭环仿真评价稳定性、扰动抑制效果和控制输入代价。</p><p>在教学包接口中，该通道对应第 3 路控制命令 <code>u_z</code> 与第 3 路输出 <code>vz</code>。FZ 为本作业的通道标记，输入按教学包的虚拟命令量使用。</p></li>
+            <li><h3>多输入多输出控制器设计</h3><p>针对完整 MIMO 系统设计反馈控制器，说明控制结构及其处理多通道耦合的思路，绘制灵敏度矩阵的奇异值曲线，并结合闭环仿真评价多通道抑振效果、耦合影响和控制输入代价。</p><p>报告应将完整系统的稳定性分析与仿真结果联系起来，对不同运动方向的响应变化和设计取舍给出解释。</p></li>
+          </ol>
+          <div class="note"><strong>设计成果</strong><p>在控制设计报告中呈现模型分析、设计过程、灵敏度曲线、闭环对比结果与结论，并提供可运行代码及复现所需的参数说明。</p></div>
+        </section>
+
+        <section id="evaluation" class="document-section" aria-labelledby="evaluation-title">
+          <div class="section-heading"><span class="section-number">06</span><h2 id="evaluation-title">控制性能评价</h2></div>
+          <p class="section-lead">绘制六路含噪测量输出的 ASD，对比 Control off 与 Control on。</p>
+          <p>对 X、Y、Z、RX、RY、RZ 六个通道分别作图，每张图叠加无控制与闭环控制曲线。两种工况应使用相同的扰动与噪声实现、记录时长、初始条件和谱分析参数，以保证比较条件一致。</p>
+          <h3>统一的谱估计规范</h3>
+          <p>对含噪速度测量信号使用 Welch 方法估计功率谱密度（PSD），再换算为位移或转角等效幅值谱密度（ASD）。含噪信号应先在时域相加，再计算 PSD。</p>
+          <div class="table-scroll" role="region" aria-label="Welch 参数" tabindex="0"><table><thead><tr><th scope="col">参数</th><th scope="col">统一设置</th></tr></thead><tbody>
+            <tr><th scope="row">采样频率</th><td><code>fs = 10000 Hz</code></td></tr>
+            <tr><th scope="row">分段长度</th><td><code>nperseg = 1000000</code></td></tr>
+            <tr><th scope="row">窗函数</th><td>周期 Hann 窗</td></tr>
+            <tr><th scope="row">重叠</th><td>50%，<code>noverlap = 500000</code></td></tr>
+            <tr><th scope="row">去趋势</th><td><code>detrend = constant</code></td></tr>
+            <tr><th scope="row">谱归一化与平均</th><td><code>scaling = density</code>，<code>average = mean</code></td></tr>
+          </tbody></table></div>
+          <div class="equation asd-equation" aria-label="ASD 等于 PSD 的平方根，除以二乘以圆周率乘以频率加十的负三十次方">
+            <span>ASD(<var>f</var>) = </span><span class="fraction"><span>√PSD(<var>f</var>)</span><span>2π<var>f</var> + 10<sup>−30</sup></span></span>
+          </div>
+          <h3>六图格式</h3>
+          <ul class="prose-list">
+            <li>频率范围统一为 <strong>0.01–100 Hz</strong>，零频不进入对数图。</li>
+            <li>同一通道的两条曲线共用坐标轴，纵轴上下预留约 <strong>8%</strong> 的显示余量。</li>
+            <li>平移通道单位为 <strong>m/√Hz</strong>，转动通道单位为 <strong>rad/√Hz</strong>。</li>
+            <li>图例统一标注 <strong>Control off</strong> 与 <strong>Control on</strong>，图题标明通道。</li>
+          </ul>
+          <p>这些曲线是由测量速度换算得到的位移或转角等效 ASD，保留测量链和噪声的影响。结果分析应说明控制后哪些频段得到抑制、哪些频段出现变化，并结合稳定性、耦合与控制输入解释原因。</p>
+        </section>
+
+        <section id="materials" class="document-section" aria-labelledby="materials-title">
+          <div class="section-heading"><span class="section-number">07</span><h2 id="materials-title">材料与使用方法</h2></div>
+          <p class="section-lead">模型、扰动、噪声和使用示例已打包提供。</p>
+          <div class="download-row"><div><h3>Model-1019 教学包</h3><p>v1.0 · ZIP · 72 KB</p></div><a class="button" href="downloads/model1019_coursework_v1.zip" download>下载完整材料 <span aria-hidden="true">↓</span></a></div>
+          <p>教学包包含连续时间状态空间模型、地面运动源、传感噪声谱及生成器，以及 Python 和 MATLAB 两套使用示例。示例为无控制系统，六路控制命令固定为零，不包含已设计的控制器。</p>
+          <div class="table-scroll" role="region" aria-label="教学包文件说明" tabindex="0"><table><thead><tr><th scope="col">内容</th><th scope="col">位置</th><th scope="col">用途</th></tr></thead><tbody>
+            <tr><th scope="row">使用手册</th><td><code>docs/USER_GUIDE.html</code><br><code>docs/USER_GUIDE.md</code></td><td>接口定义、运行方法和频谱分析规范</td></tr>
+            <tr><th scope="row">模型与信号资源</th><td><code>data/</code></td><td>模型矩阵、地面源和噪声谱</td></tr>
+            <tr><th scope="row">Python 示例</th><td><code>python/</code></td><td>无控制仿真与 ASD 绘制</td></tr>
+            <tr><th scope="row">MATLAB 示例</th><td><code>matlab/</code></td><td>独立的无控制仿真实现</td></tr>
+          </tbody></table></div>
+          <h3>开始使用</h3>
+          <p>解压后先阅读 <code>docs/USER_GUIDE.html</code>，确认模型接口、单位约定及运行环境，再从解压目录运行示例。</p>
+          <div class="command"><div class="command-header"><span>Python</span><button class="copy-button" type="button" data-copy="python python/run_example.py" aria-label="复制 Python 运行命令">复制命令</button></div><pre><code>python python/run_example.py</code></pre></div>
+          <p class="small-text">使用 Python 3.10 或更高版本，并准备 NumPy、SciPy、Matplotlib。具体版本要求见包内使用手册与依赖清单。</p>
+          <div class="command"><div class="command-header"><span>MATLAB</span><button class="copy-button" type="button" data-copy="addpath(fullfile(pwd,'matlab'));&#10;run_example;" aria-label="复制 MATLAB 运行命令">复制命令</button></div><pre><code>addpath(fullfile(pwd,'matlab'));
+run_example;</code></pre></div>
+          <p class="small-text">在 MATLAB 中切换到解压目录后执行。无控制主示例采用基础函数，具体环境要求见使用手册。</p>
+          <p>示例运行后生成频谱、ASD 图及运行设置记录。包内未附预生成的仿真结果；控制器设计和闭环结果需由各组自行完成。正式比较时保持同一语言实现中的输入、噪声和分析设置一致。</p>
+          <div class="note"><strong>复现说明</strong><p>提交时说明软件环境、控制器参数、仿真条件、谱分析设置和运行入口，使报告中的图与结论能够由所提交的代码复现。</p></div>
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer class="site-footer"><span>控制课程大作业 · Model-1019</span><div><a href="https://github.com/pifuyuini/modern-control-project">GitHub 仓库 ↗</a><a href="#top">返回顶部 ↑</a></div></footer>
+  <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+</body>
+</html>
