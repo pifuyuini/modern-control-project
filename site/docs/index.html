@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fafaf8"><meta name="description" content="Model-1019 教学包使用手册：运行环境、Python 与 MATLAB 示例、状态空间模型接口、地面扰动与测量噪声、Welch 与 ASD 规范。"><title>教学包使用手册 · Model-1019</title><link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml"><link rel="stylesheet" href="../styles.css"><script src="../script.js" defer></script></head>
+<body class="guide-page"><a class="skip-link" href="#main-content">跳转到手册正文</a>
+<header class="site-header"><a class="wordmark" href="../" aria-label="返回课程作业首页"><img class="brand-mark" src="../assets/brandmark.svg" alt=""><span>控制课程大作业</span></a><nav class="header-links" aria-label="站点导航"><a href="../">作业说明</a><a href="../downloads/model1019_coursework_v1.zip" download>下载教学包</a></nav></header>
+<main id="main-content"><section class="hero guide-hero" id="top" aria-labelledby="page-title"><p class="eyebrow">MODEL-1019 / USER GUIDE</p><h1 id="page-title">教学包使用手册</h1><div class="hero-bottom"><div class="hero-description"><p>运行示例、连接模型与信号，并按统一规范完成频谱分析。以下内容适用于教学包 v1.0。</p><div class="hero-actions"><a class="button" href="../downloads/model1019_coursework_v1.zip" download>下载完整教学包</a><a class="button button-secondary" href="../downloads/model1019.mat" download>仅下载模型 MAT</a><a class="text-link" href="USER_GUIDE.md" download>下载 Markdown 文档</a></div></div></div></section>
+<div class="document-layout"><aside class="contents"><nav aria-label="手册目录"><p class="contents-label">使用手册</p><a href="#guide-1"><span>01</span>交付范围与固定约定</a>
+<a href="#guide-2"><span>02</span>文件组成</a>
+<a href="#guide-3"><span>03</span>运行环境与资源要求</a>
+<a href="#guide-4"><span>04</span>快速开始</a>
+<a href="#guide-5"><span>05</span>模型接口</a>
+<a href="#guide-6"><span>06</span>地面扰动源</a>
+<a href="#guide-7"><span>07</span>传感噪声</a>
+<a href="#guide-8"><span>08</span>示例如何组织信号</a>
+<a href="#guide-9"><span>09</span>PSD 与 ASD 的统一规范</a>
+<a href="#guide-10"><span>10</span>输出文件说明</a>
+<a href="#guide-11"><span>11</span>可调整项与结果可比性</a>
+<a href="#guide-12"><span>12</span>常见使用问题</a>
+<a href="#guide-13"><span>13</span>使用边界与交付状态</a>
+<a href="#guide-14"><span>14</span>函数说明参考</a></nav></aside><article class="document guide-document"><section id="guide-1" class="document-section" aria-labelledby="guide-title-1"><div class="section-heading"><span class="section-number">01</span><h2 id="guide-title-1">交付范围与固定约定</h2></div><p>本教学包提供四项内容：连续时间状态空间模型、地面运动源、传感噪声谱及其生成器、Python 与 MATLAB 两套完整使用示例。全部运行资源随包提供，示例不需要访问原研究仓库或下载地面源数据。</p>
+<p>模型统一称为 Model-1019，包含控制输入、基座扰动输入和六路测量输出，导出文件命名为 <code>model1019.mat</code>。外部输入、输出已统一为本手册规定的单位。模型保留通道间耦合；“六通道”不表示六个完全独立的单输入单输出对象。</p>
+<p><strong>外部接口统一使用 SI 单位。</strong> 模型和噪声生成器已经完成转动通道的尺度换算。基座转角直接使用 rad，输出角速度直接使用 rad/s，调用方无需再次进行长度缩放。</p>
+<p>示例只连接地面源、模型和传感噪声，六路执行器命令均为零。包内不包含控制器、控制器参数或控制器设计示例。</p>
+</section>
+<section id="guide-2" class="document-section" aria-labelledby="guide-title-2"><div class="section-heading"><span class="section-number">02</span><h2 id="guide-title-2">文件组成</h2></div><pre><code class="language-text">model1019_coursework/
+  README.md
+  PACKAGE_INFO.json
+  data/
+    model1019.mat
+    activity_source.mat
+    activity_config.json
+    sensor_noise_psd.csv
+  python/
+    requirements.txt
+    run_example.py
+    sources.py
+    simulation.py
+  matlab/
+    run_example.m
+    activity_motion.m
+    sensor_noise.m
+    real_record.m
+    FOHPlant.m
+    WelchAccumulator.m
+    plot_asds.m
+</code></pre>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>文件或目录</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>data/model1019.mat</code></td>
+<td>连续时间 A、B、C、D，以及通道说明、固定长度和初始状态换算矩阵</td>
+</tr>
+<tr>
+<td><code>data/activity_source.mat</code></td>
+<td>两种语言共同读取的地面源参数与参考数据</td>
+</tr>
+<tr>
+<td><code>data/activity_config.json</code></td>
+<td>地面源配置的可读记录，供查阅；运行时以 <code>activity_source.mat</code> 为准</td>
+</tr>
+<tr>
+<td><code>data/sensor_noise_psd.csv</code></td>
+<td>教学用传感噪声谱表，字段为 <code>f,P_ns</code></td>
+</tr>
+<tr>
+<td><code>python/</code></td>
+<td>Python 源生成、模型计算、Welch 和绘图代码</td>
+</tr>
+<tr>
+<td><code>matlab/</code></td>
+<td>MATLAB 对应代码，独立运行，不调用 Python</td>
+</tr>
+<tr>
+<td><code>PACKAGE_INFO.json</code></td>
+<td>交付版本、固定参数、数据来源和审阅状态</td>
+</tr>
+</tbody></table></div>
+<p>使用手册已单独部署在<a href="./">课程网站</a>，不再随压缩包重复提供。</p>
+<p>第一次运行后会出现 <code>outputs/</code> 目录。此目录是计算结果目录，不属于模型或源的输入资源。</p>
+</section>
+<section id="guide-3" class="document-section" aria-labelledby="guide-title-3"><div class="section-heading"><span class="section-number">03</span><h2 id="guide-title-3">运行环境与资源要求</h2></div><h3>3.1 Python</h3>
+<p>使用 Python 3.10 或更高版本，并准备以下依赖：NumPy 1.24 或更高版本、SciPy 1.10 或更高版本、Matplotlib 3.7 或更高版本。依赖清单位于 <code>python/requirements.txt</code>。教师可以在课程统一环境中预先配置这些库；示例本身不会安装库、修改环境或下载文件。</p>
+<p>运行入口通过自身位置寻找 <code>data/</code>，因此可以从任意工作目录调用。不要仅复制 <code>run_example.py</code>，应保留完整的包目录结构。</p>
+<h3>3.2 MATLAB</h3>
+<p>代码面向 MATLAB R2019a 或更新版本，使用 <code>readmatrix</code>、<code>RandStream</code>、<code>fft</code>、<code>ifft</code>、<code>filter</code>、<code>eig</code> 等基础函数。主示例不使用 <code>ss</code>、<code>lsim</code> 或 <code>pwelch</code>，无需为本示例另配控制或信号处理工具箱。</p>
+<p>启动前将包中的 <code>matlab/</code> 加入 MATLAB 路径。源文件和 MAT 资源以 UTF-8 文件名和普通 MAT 格式分发。</p>
+<h3>3.3 内存与磁盘</h3>
+<p>默认采样数为 N = 10000 × 1000 = 10000000。一个 N×6 的 double 数组占约 480 MB；地面和传感噪声两个完整数组合计约 960 MB，另有 FFT、模型分块计算和 Welch 缓冲区。因此运行时应预留数 GB 可用内存。这里是数组尺寸估算，不是实测峰值或运行时长报告。</p>
+<p>示例把完整源时程保存在内存中，模型输出按 100000 点分块处理。默认仅保存频谱、图和运行设置，不把大体积时程写入磁盘。退出程序后，内存中的时程释放。</p>
+</section>
+<section id="guide-4" class="document-section" aria-labelledby="guide-title-4"><div class="section-heading"><span class="section-number">04</span><h2 id="guide-title-4">快速开始</h2></div><h3>4.1 运行 Python 示例</h3>
+<p>解压后，在包根目录执行：</p>
+<pre><code class="language-sh">python python/run_example.py
+</code></pre>
+<p>也可以使用绝对路径，从其他工作目录调用：</p>
+<pre><code class="language-sh">python /path/to/model1019_coursework/python/run_example.py
+</code></pre>
+<p>默认配置为 10 kHz、1000 s、给定地面扰动场景、地面种子 1024、传感噪声种子 20260114。程序在终端输出源生成和模型处理进度，最终将结果写入 <code>outputs/python/</code>。</p>
+<p>指定新的随机实现和输出目录：</p>
+<pre><code class="language-sh">python python/run_example.py --ground-seed 1042 --noise-seed 20260115 --output outputs/python_case2
+</code></pre>
+<h3>4.2 运行 MATLAB 示例</h3>
+<p>将 MATLAB 当前文件夹切换到包根目录，然后执行：</p>
+<pre><code class="language-matlab">addpath(fullfile(pwd,&#39;matlab&#39;));
+run_example;
+</code></pre>
+<p>从其他位置调用时，明确指定包目录：</p>
+<pre><code class="language-matlab">package_dir = &#39;/path/to/model1019_coursework&#39;;
+addpath(fullfile(package_dir,&#39;matlab&#39;));
+run_example(1000,1024,20260114,fullfile(package_dir,&#39;outputs&#39;,&#39;matlab&#39;));
+</code></pre>
+<p>默认结果写入 <code>outputs/matlab/</code>。Python 和 MATLAB 使用不同目录，避免两套示例覆盖彼此结果。同一语言反复使用相同输出目录时，会覆盖同名结果文件。</p>
+<h3>4.3 仅缩短记录进行接口学习</h3>
+<p>两版入口允许改变记录时长，最短为 100 s，因为固定的 Welch 分段长度对应 100 s。正式作业比较建议保持默认 1000 s。</p>
+<pre><code class="language-sh">python python/run_example.py --duration 200 --output outputs/python_200s
+</code></pre>
+<pre><code class="language-matlab">run_example(200,1024,20260114,fullfile(package_dir,&#39;outputs&#39;,&#39;matlab_200s&#39;));
+</code></pre>
+<p>缩短时长会改变源的频率网格、可覆盖的低频、事件是否出现和 Welch 平均次数。200 s 记录的 FFT 网格间距为 0.005 Hz，不能生成 0.001 Hz 独立频点，也可能无法覆盖完整的时变扰动。因此短记录结果不能当作默认 1000 s 情景的等价结果。</p>
+</section>
+<section id="guide-5" class="document-section" aria-labelledby="guide-title-5"><div class="section-heading"><span class="section-number">05</span><h2 id="guide-title-5">模型接口</h2></div><h3>5.1 基本方程与矩阵尺寸</h3>
+<p>导出的模型是连续时间系统：</p>
+<pre><code class="language-text">dx/dt = A x + B u
+y_clean = C x + D u
+u = [u_actuator; b_si]
+y_measured = y_clean + n_si
+</code></pre>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>变量</th>
+<th>尺寸</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>A</code></td>
+<td>20×20</td>
+<td>连续时间状态矩阵</td>
+</tr>
+<tr>
+<td><code>B</code></td>
+<td>20×12</td>
+<td>前六列为执行器命令，后六列为基座运动</td>
+</tr>
+<tr>
+<td><code>C</code></td>
+<td>6×20</td>
+<td>六路无附加噪声的测量输出</td>
+</tr>
+<tr>
+<td><code>D</code></td>
+<td>6×12</td>
+<td>直接传递矩阵；使用时应完整保留</td>
+</tr>
+<tr>
+<td><code>x</code></td>
+<td>20×1</td>
+<td>导出实现的内部状态</td>
+</tr>
+<tr>
+<td><code>u</code></td>
+<td>12×1</td>
+<td>单时刻完整输入列向量</td>
+</tr>
+<tr>
+<td><code>y_clean</code>、<code>y_measured</code></td>
+<td>6×1</td>
+<td>单时刻测量速度列向量</td>
+</tr>
+</tbody></table></div>
+<p>文件中的 <code>sample_time=0</code> 表示连续时间。示例采用 10000 Hz 的时间网格对该连续系统进行计算，不能直接把连续 A、B 当成离散递推矩阵使用。</p>
+<h3>5.2 十二路输入顺序</h3>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>MATLAB 列号</th>
+<th>Python 列下标</th>
+<th>名称</th>
+<th>物理量与单位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1–6</td>
+<td>0–5</td>
+<td><code>u_x,u_y,u_z,u_LRx,u_LRy,u_LRz</code></td>
+<td>模型的六路几何虚拟执行器命令；示例全部置零</td>
+</tr>
+<tr>
+<td>7</td>
+<td>6</td>
+<td><code>base_x</code></td>
+<td>基座 x 位移，m</td>
+</tr>
+<tr>
+<td>8</td>
+<td>7</td>
+<td><code>base_y</code></td>
+<td>基座 y 位移，m</td>
+</tr>
+<tr>
+<td>9</td>
+<td>8</td>
+<td><code>base_z</code></td>
+<td>基座 z 位移，m</td>
+</tr>
+<tr>
+<td>10</td>
+<td>9</td>
+<td><code>base_theta_x</code></td>
+<td>基座绕 x 轴转角，rad</td>
+</tr>
+<tr>
+<td>11</td>
+<td>10</td>
+<td><code>base_theta_y</code></td>
+<td>基座绕 y 轴转角，rad</td>
+</tr>
+<tr>
+<td>12</td>
+<td>11</td>
+<td><code>base_theta_z</code></td>
+<td>基座绕 z 轴转角，rad</td>
+</tr>
+</tbody></table></div>
+<p>基座通道接收的是<strong>位移与小转角</strong>，不是速度、加速度或执行器命令。地面生成器的输出可直接连接这六列，不需要额外积分、数值微分或长度缩放。</p>
+<p>前六列命令的单位沿用原模型的虚拟命令约定，不能解释为 N 或 N·m，也不能把地面位移填入这些列。命令名称中的 <code>L</code> 保留源模型的通道命名，不构成要求调用方再进行单位换算。</p>
+<h3>5.3 六路输出顺序</h3>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>MATLAB 列号</th>
+<th>Python 列下标</th>
+<th>输出名称</th>
+<th>单位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0</td>
+<td><code>vx_apparent</code></td>
+<td>m/s</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td><code>vy_apparent</code></td>
+<td>m/s</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td><code>vz</code></td>
+<td>m/s</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3</td>
+<td><code>omega_x</code></td>
+<td>rad/s</td>
+</tr>
+<tr>
+<td>5</td>
+<td>4</td>
+<td><code>omega_y</code></td>
+<td>rad/s</td>
+</tr>
+<tr>
+<td>6</td>
+<td>5</td>
+<td><code>omega_z</code></td>
+<td>rad/s</td>
+</tr>
+</tbody></table></div>
+<p>输出保留模型已有的测量链，包括倾角相关项和低通状态。尤其前两路是表观速度。按本手册绘制的输出 ASD 是测量速度换算后的位移／转角等效 ASD，不应直接称为未经过测量链的真实机械位移 ASD。</p>
+<h3>5.4 MAT 文件中的辅助字段</h3>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>尺寸／值</th>
+<th>用法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>B_actuator</code>、<code>B_ground</code></td>
+<td>各 20×6</td>
+<td>分别对应 B 的前六列和后六列</td>
+</tr>
+<tr>
+<td><code>D_actuator</code>、<code>D_ground</code></td>
+<td>各 6×6</td>
+<td>对应 D 的输入分组</td>
+</tr>
+<tr>
+<td><code>state_recovery_J_si</code></td>
+<td>20×6</td>
+<td>初始化辅助字段，默认由包内求解器处理</td>
+</tr>
+<tr>
+<td><code>input_names</code>、<code>input_units</code></td>
+<td>各 12 项</td>
+<td>输入的名称与单位</td>
+</tr>
+<tr>
+<td><code>output_names</code>、<code>output_units</code></td>
+<td>各 6 项</td>
+<td>输出的名称与单位</td>
+</tr>
+<tr>
+<td><code>state_names</code>、<code>state_units</code></td>
+<td>各 20 项</td>
+<td>内部状态说明</td>
+</tr>
+</tbody></table></div>
+<p>MAT 文件中的矩阵已与外部 SI 接口一致。直接使用提供的 A、B、C、D 及配套源生成器，不需要额外转换转动输入或输出。</p>
+<h3>5.5 初始状态与分块计算</h3>
+<p>模型中的辅助状态与机械运动状态采用不同的定义。默认无控制示例的初始条件已由包内求解器设置。两版 <code>FOHPlant</code> 都会结合基座初始输入完成初始化，因此应按示例传入首个完整输入样本。</p>
+<p>分块处理时应持续使用同一个 <code>FOHPlant</code> 对象，不能每个数据块重新创建对象，否则会反复重置状态。若自行实现模型求解，应保持与配套示例一致的初始化约定，并在报告中说明。</p>
+</section>
+<section id="guide-6" class="document-section" aria-labelledby="guide-title-6"><div class="section-heading"><span class="section-number">06</span><h2 id="guide-title-6">地面扰动源</h2></div><p>地面源采用教学包给定的合成场景。数值配置封装在 <code>activity_source.mat</code>，Python 与 MATLAB 实现读取同一份资源文件。</p>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>约定</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输出变量</td>
+<td><code>b_si</code></td>
+</tr>
+<tr>
+<td>数组形状</td>
+<td>N×6；每行一个时刻，每列一个自由度</td>
+</tr>
+<tr>
+<td>通道顺序</td>
+<td>x、y、z、theta_x、theta_y、theta_z</td>
+</tr>
+<tr>
+<td>单位</td>
+<td>前三列 m，后三列 rad</td>
+</tr>
+<tr>
+<td>目标通带</td>
+<td>0.001–1000 Hz</td>
+</tr>
+<tr>
+<td>默认采样率／时长</td>
+<td>10000 Hz／1000 s</td>
+</tr>
+<tr>
+<td>默认随机种子</td>
+<td>1024</td>
+</tr>
+<tr>
+<td>默认时刻</td>
+<td>t[k]=k/fs，k=0,…,N−1；最后时刻为 999.9999 s</td>
+</tr>
+</tbody></table></div>
+<p>0.001–1000 Hz 为本版本的目标通带。六路地面运动具有相关性，应使用配套生成器保留既定信号关系，不能仅按六条独立自谱替代整个地面源。</p>
+<p>生成器使用谱方法形成有限记录；在给定时长 T 下，频率网格间距为 1/T。默认 1000 s 可包含 0.001 Hz 网格点，但该最低频率只有一个记录周期。源的设定频带不等同于 Welch 图的可分辨频带。</p>
+<p>单独调用：</p>
+<pre><code class="language-python">from sources import activity_motion
+b_si = activity_motion(fs=10000, duration=1000, seed=1024)
+</code></pre>
+<pre><code class="language-matlab">b_si = activity_motion(10000,1000,1024);
+</code></pre>
+<p>上述 Python 导入要求 <code>python/</code> 位于模块搜索路径中，例如在 <code>python/</code> 中编写自己的脚本，或从该目录启动交互环境。MATLAB 调用前需要先将 <code>matlab/</code> 加入路径。</p>
+</section>
+<section id="guide-7" class="document-section" aria-labelledby="guide-title-7"><div class="section-heading"><span class="section-number">07</span><h2 id="guide-title-7">传感噪声</h2></div><h3>7.1 谱文件接口</h3>
+<p><code>sensor_noise_psd.csv</code> 保留给定文件的两列内容，首行为列名：</p>
+<pre><code class="language-text">f,P_ns
+</code></pre>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>单位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>f</code></td>
+<td>频率</td>
+<td>Hz</td>
+</tr>
+<tr>
+<td><code>P_ns</code></td>
+<td>单边、按 Hz 计的速度等效功率谱密度</td>
+<td>(m/s)²/Hz</td>
+</tr>
+</tbody></table></div>
+<p>表中数值是 PSD，不是 ASD，也不是 dB。程序在 0.001–1000 Hz 内对频率与 PSD 的对数作线性插值，不在表外延拓；这一频带以外的传感噪声谱置零。</p>
+<h3>7.2 六路生成与单位</h3>
+<p>程序依据给定谱表生成六路独立的随机噪声，并在生成器内部完成单位处理。前三路输出单位为 m/s，后三路输出单位为 rad/s。返回结果可直接与同顺序的模型测量输出相加。</p>
+<pre><code class="language-python">from sources import sensor_noise
+n_si = sensor_noise(fs=10000, duration=1000, seed=20260114)
+</code></pre>
+<pre><code class="language-matlab">n_si = sensor_noise(10000,1000,20260114);
+</code></pre>
+<p><code>n_si</code> 的形状为 N×6，通道顺序与模型输出一致，可直接与 <code>y_clean</code> 相加。生成器的返回值已经完成角速度换算，不需要再次进行长度缩放。六路独立指随机生成过程独立；有限记录的样本相关系数不要求严格等于零。</p>
+<h3>7.3 注入位置</h3>
+<p>噪声在模型已有测量链之后加入：<code>y_measured = y_clean + n_si</code>。不能把这份速度等效噪声接到模型的基座位移输入，也不能在相加后再次通过模型 C、D 或其低通状态。</p>
+</section>
+<section id="guide-8" class="document-section" aria-labelledby="guide-title-8"><div class="section-heading"><span class="section-number">08</span><h2 id="guide-title-8">示例如何组织信号</h2></div><p>两版入口采用相同的步骤：生成地面位移和传感噪声；将六路零执行器命令与地面位移拼成十二路输入；初始化并逐块推进模型；在输出后加噪声；累计四组信号的 Welch PSD；换算并绘制 ASD。</p>
+<ol>
+<li>生成基座位移和转角 <code>b_si</code>。</li>
+<li>将六路零控制命令与 <code>b_si</code> 合并为十二路输入 <code>u</code>。</li>
+<li>推进状态空间模型，得到 <code>y_clean</code>。</li>
+<li>在测量输出端加入 <code>n_si</code>，得到 <code>y_measured</code>。</li>
+<li>累计各组信号的 PSD，换算并绘制 ASD。</li>
+</ol>
+<h3>8.1 Python 中的连接片段</h3>
+<pre><code class="language-python">from pathlib import Path
+import numpy as np
+from scipy.io import loadmat
+from simulation import FOHPlant
+
+package_dir = Path(&#39;/path/to/model1019_coursework&#39;)
+M = loadmat(package_dir/&#39;data&#39;/&#39;model1019.mat&#39;, simplify_cells=True)
+# b_si 和 n_si 均为已生成的 N×6 数组。
+plant = FOHPlant(M,10000,np.r_[np.zeros(6),b_si[0]])
+for start in range(0,len(b_si),100000):
+    base = b_si[start:start+100000]
+    u = np.column_stack((np.zeros_like(base),base))
+    y_clean = plant.process(u)
+    y_measured = y_clean+n_si[start:start+len(base)]
+    # 在这里使用当前块的结果；完整示例将其送入 WelchAccumulator。
+</code></pre>
+<h3>8.2 MATLAB 中的连接片段</h3>
+<pre><code class="language-matlab">M = load(fullfile(package_dir,&#39;data&#39;,&#39;model1019.mat&#39;));
+plant = FOHPlant(M,10000,[zeros(1,6),b_si(1,:)]);
+for first = 1:100000:size(b_si,1)
+    last = min(first+99999,size(b_si,1));
+    base = b_si(first:last,:);
+    u = [zeros(size(base)),base];
+    y_clean = plant.process(u);
+    y_measured = y_clean+n_si(first:last,:);
+    % 在这里使用当前块的结果；完整示例将其送入 WelchAccumulator。
+end
+</code></pre>
+<p>模型处理器按样点间线性插值的一阶保持（FOH）约定处理输入，该约定已包含在配套示例中。示例按给定初始化方式启动，默认保留全部 1000 s，包含启动过程，不自动删去前段。</p>
+</section>
+<section id="guide-9" class="document-section" aria-labelledby="guide-title-9"><div class="section-heading"><span class="section-number">09</span><h2 id="guide-title-9">PSD 与 ASD 的统一规范</h2></div><h3>9.1 Welch 参数</h3>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>固定值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>fs</code></td>
+<td>10000 Hz</td>
+</tr>
+<tr>
+<td><code>nperseg</code>／分段长度</td>
+<td>1000000 点，即 100 s</td>
+</tr>
+<tr>
+<td>窗</td>
+<td>周期 Hann；不是两端对称 Hann</td>
+</tr>
+<tr>
+<td>重叠长度</td>
+<td>500000 点，即 50%</td>
+</tr>
+<tr>
+<td><code>nfft</code></td>
+<td>1000000</td>
+</tr>
+<tr>
+<td>去趋势</td>
+<td>每一段先减去该段均值；constant detrend</td>
+</tr>
+<tr>
+<td>归一化</td>
+<td>density，PSD 按 Hz 计</td>
+</tr>
+<tr>
+<td>平均方式</td>
+<td>mean，对分段功率谱作算术平均</td>
+</tr>
+<tr>
+<td>频谱类型</td>
+<td>实信号单边谱</td>
+</tr>
+<tr>
+<td>频率间距</td>
+<td>0.01 Hz</td>
+</tr>
+<tr>
+<td>默认完整段数</td>
+<td>19 段</td>
+</tr>
+</tbody></table></div>
+<p>窗口定义为 <code>w[n]=0.5−0.5 cos(2πn/M)</code>，其中 M=1000000，n=0,…,M−1。逐段去均值后加窗，FFT 幅值平方除以 <code>fs × sum(w²)</code>。转换为单边谱时，除 DC 和 Nyquist 点外其余频点乘以 2。最后对各段 PSD 求算术平均。</p>
+<p>只去除整条记录的均值不等价于逐段 constant detrend；对每段 ASD 求平均也不等价于先平均 PSD 再开平方。</p>
+<h3>9.2 Python 标准函数写法</h3>
+<p>包内为降低内存使用而实现了分块 Welch 累加器。其采用的定义对应以下 SciPy 调用，其中 <code>x</code> 为 N×通道数的实数组：</p>
+<pre><code class="language-python">from scipy import signal
+window = signal.windows.hann(1000000,sym=False)
+f,P = signal.welch(
+    x,fs=10000,window=window,nperseg=1000000,
+    noverlap=500000,nfft=1000000,detrend=&#39;constant&#39;,
+    return_onesided=True,scaling=&#39;density&#39;,average=&#39;mean&#39;,axis=0)
+</code></pre>
+<p>此段说明算法约定，不表示已经执行数值比较。</p>
+<h3>9.3 MATLAB 的对应实现</h3>
+<p>包内 <code>WelchAccumulator</code> 使用基础 <code>fft</code> 明确实现相同定义，不依赖 <code>pwelch</code> 的默认窗口、去均值或归一化约定。使用方法为：</p>
+<pre><code class="language-matlab">W = WelchAccumulator(24,10000,1000000);
+% 每个 block 都应按相同的列顺序传入，并连续使用同一个 W。
+W.push([base,y_clean,noise,y_measured]);
+[f,P] = W.result();
+</code></pre>
+<p>累加器保留上一完整段的后 500000 点。数据块边界不会重新定义 Welch 分段位置。记录末尾不足一个完整段的余量不单独计算；默认 1000 s 恰好得到 19 段。</p>
+<h3>9.4 从 PSD 换算 ASD</h3>
+<p>四组信号的处理规则如下：</p>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>信号组</th>
+<th>输入 PSD 对应的量</th>
+<th>位移／转角等效 ASD</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ground</td>
+<td>位移／转角</td>
+<td><code>sqrt(P_ground)</code></td>
+</tr>
+<tr>
+<td>clean</td>
+<td>测量速度／角速度</td>
+<td><code>sqrt(P_clean)/(2*pi*f+1e-30)</code></td>
+</tr>
+<tr>
+<td>noise</td>
+<td>速度／角速度噪声</td>
+<td><code>sqrt(P_noise)/(2*pi*f+1e-30)</code></td>
+</tr>
+<tr>
+<td>measured</td>
+<td>含噪测量速度／角速度</td>
+<td><code>sqrt(P_measured)/(2*pi*f+1e-30)</code></td>
+</tr>
+</tbody></table></div>
+<p>地面源已经是位移／转角，不应再除以 2πf。其余三组必须使用 <code>2*pi*f</code>，不能仅除以 f。前三列最终单位为 m/√Hz，后三列为 rad/√Hz。</p>
+<p><code>1e-30</code> 仅用于避免零频数值除零；零频的速度积分结果没有用于比较的意义。绘图必须排除 f=0，不能把该点放入对数坐标。</p>
+<p>含噪输出应先在时域相加，再计算该记录的 PSD。有限记录中不应直接把 <code>ASD_clean+ASD_noise</code> 当作含噪输出 ASD；即使在独立随机过程的集合意义下，可相加的也是 PSD，而不是 ASD。</p>
+<h3>9.5 六图格式</h3>
+<p>以下先说明无控制示例的四组信号图。作业中的控制性能对比，应在相同条件下分别计算 Control off 与 Control on 的含噪测量输出，并在每个通道的同一坐标轴中叠加两种工况，频率范围、单位和留白规则相同。</p>
+<p>使用 2 行×3 列子图，按 x、y、z、theta_x、theta_y、theta_z 排列。每幅图显示 ground、clean、noise、measured 四条曲线。</p>
+<ul>
+<li>横轴为对数频率，范围固定 0.01–100 Hz；零频排除。</li>
+<li>纵轴为对数 ASD；前三幅用 m/√Hz，后三幅用 rad/√Hz。</li>
+<li>每幅图按其四条曲线在显示频带内的有限正值共同确定纵轴范围。</li>
+<li>设 a=log10(最小值)、b=log10(最大值)，上下限取 <code>10^(a−0.08(b−a))</code>、<code>10^(b+0.08(b−a))</code>，即在对数空间各留约 8% 余量。</li>
+<li>图题注明情景、无控制状态、采样率和时长，图中或图注记录 Welch 参数。</li>
+</ul>
+</section>
+<section id="guide-10" class="document-section" aria-labelledby="guide-title-10"><div class="section-heading"><span class="section-number">10</span><h2 id="guide-title-10">输出文件说明</h2></div><h3>10.1 spectra.mat</h3>
+<p>两版程序采用相同字段和列顺序，仅保存 0–100 Hz 的谱用于作业绘图。源仍按完整设定频带生成，结果文件截取频率不代表时域信号经过 100 Hz 低通。</p>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>形状／类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>frequency_hz</code></td>
+<td>10001×1，默认配置</td>
+<td>0、0.01、…、100 Hz</td>
+</tr>
+<tr>
+<td><code>psd</code></td>
+<td>10001×24</td>
+<td>四组各六路的单边 PSD</td>
+</tr>
+<tr>
+<td><code>asd</code></td>
+<td>10001×24</td>
+<td>按第 9 节换算后的 ASD</td>
+</tr>
+<tr>
+<td><code>group_order</code></td>
+<td>4 项</td>
+<td>ground、clean、noise、measured</td>
+</tr>
+<tr>
+<td><code>channel_order</code></td>
+<td>6 项</td>
+<td>x、y、z、theta_x、theta_y、theta_z</td>
+</tr>
+<tr>
+<td><code>welch_segment_count</code></td>
+<td>标量</td>
+<td>实际完整分段数，默认应为 19</td>
+</tr>
+</tbody></table></div>
+<div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>MATLAB 列</th>
+<th>Python 切片</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1:6</td>
+<td><code>[:,0:6]</code></td>
+<td>ground</td>
+</tr>
+<tr>
+<td>7:12</td>
+<td><code>[:,6:12]</code></td>
+<td>clean</td>
+</tr>
+<tr>
+<td>13:18</td>
+<td><code>[:,12:18]</code></td>
+<td>noise</td>
+</tr>
+<tr>
+<td>19:24</td>
+<td><code>[:,18:24]</code></td>
+<td>measured</td>
+</tr>
+</tbody></table></div>
+<p><code>psd</code> 的不同组有不同单位：ground 为 m²/Hz 或 rad²/Hz；另外三组为 (m/s)²/Hz 或 (rad/s)²/Hz。<code>asd</code> 的四组统一为 m/√Hz 或 rad/√Hz。读取或另行作图时应使用字段分组，不要把整个 PSD 矩阵当成同一物理量。</p>
+<h3>10.2 asd_comparison.png</h3>
+<p>四组信号的六幅 ASD 对比图，按第 9 节规范生成。该图是执行示例后的输出，本教学包没有附带预先计算的示例曲线。</p>
+<h3>10.3 run_info.json</h3>
+<p>记录采样率、时长、样本数、固定参考长度、两个随机种子、Welch 参数、实际分段数、初始状态约定、执行器置零状态和运行耗时，便于在作业报告中明确计算条件。</p>
+</section>
+<section id="guide-11" class="document-section" aria-labelledby="guide-title-11"><div class="section-heading"><span class="section-number">11</span><h2 id="guide-title-11">可调整项与结果可比性</h2></div><p>入口允许调整记录时长、地面随机种子、传感噪声随机种子和输出目录。正式比较时应统一采样率、时长、种子、初始状态和频谱处理参数。</p>
+<p>接口尺度、基座输入类型、输出单位以及默认 Welch 规范均为本教学包的固定约定。<code>activity_config.json</code> 是可读记录，单独修改它不会改变运行中读取的 MAT 参数。</p>
+<p>Python 使用 NumPy 随机数生成器，MATLAB 使用本地 <code>RandStream</code>。两种语言的随机实现不同，<strong>相同数值的种子不表示跨语言逐样本一致</strong>。它们实现相同的源参数和谱定义；跨语言比较随机谱时应考虑有限记录差异。若课程另要求逐点对照，应由教师另行统一分发同一份输入时程，不能把两种独立生成的记录作为逐点误差依据。</p>
+<p>示例默认保留启动过程。如果自行截去前段，应同时说明截取区间、剩余记录长度和 Welch 段数，并对参与同一比较的信号采用一致处理；不要在报告中仍标称使用全部 1000 s。</p>
+</section>
+<section id="guide-12" class="document-section" aria-labelledby="guide-title-12"><div class="section-heading"><span class="section-number">12</span><h2 id="guide-title-12">常见使用问题</h2></div><div class="table-scroll" role="region" aria-label="手册数据表" tabindex="0"><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>应检查的事项</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python 提示无法导入 NumPy、SciPy 或 Matplotlib</td>
+<td>当前解释器是否为已配置依赖的课程环境；参考 <code>requirements.txt</code></td>
+</tr>
+<tr>
+<td>Python 提示无法导入 <code>sources</code> 或 <code>simulation</code></td>
+<td>使用给定入口，或将包中的 <code>python/</code> 加入模块路径；保留同目录文件</td>
+</tr>
+<tr>
+<td>MATLAB 找不到 <code>run_example</code> 或 <code>FOHPlant</code></td>
+<td>是否已对包内 <code>matlab/</code> 执行 <code>addpath</code></td>
+</tr>
+<tr>
+<td>找不到 MAT 或 CSV</td>
+<td>是否完整解压并保持 <code>data/</code> 与 <code>python/</code>、<code>matlab/</code> 同级</td>
+</tr>
+<tr>
+<td>运行占用较多内存</td>
+<td>完整时程会在内存生成；关闭无关大数组，或使用较短记录学习接口，并注明其频率范围改变</td>
+</tr>
+<tr>
+<td>转动通道量级不符</td>
+<td>输入应为 rad、输出为 rad/s；不得重复进行长度缩放，不得把角度数值当作弧度</td>
+</tr>
+<tr>
+<td>源和输出曲线单位不一致</td>
+<td>地面取 <code>sqrt(PSD)</code>；速度类输出取 <code>sqrt(PSD)/(2*pi*f+1e-30)</code></td>
+</tr>
+<tr>
+<td>图上出现异常零频点</td>
+<td>对数图必须筛选正频率，并限定 0.01–100 Hz</td>
+</tr>
+<tr>
+<td>每块输出都有重新启动的形态</td>
+<td>是否在循环内重新创建了 <code>FOHPlant</code>；模型对象应跨块复用</td>
+</tr>
+<tr>
+<td>两种语言相同种子得到不同曲线</td>
+<td>随机数实现不同；同种子只用于各自环境内复现，不保证跨语言逐点一致</td>
+</tr>
+</tbody></table></div>
+</section>
+<section id="guide-13" class="document-section" aria-labelledby="guide-title-13"><div class="section-heading"><span class="section-number">13</span><h2 id="guide-title-13">使用边界与交付状态</h2></div><p>本包作为课程数值计算资源提供，模型采用给定的名义实现，地面扰动为合成场景。源的 0.001–1000 Hz 通带不表示平台模型已在相同全频带获得实验辨识。作业应以本手册给定的接口和计算约定为准，无需另行推导模型或地面源的物理参数。</p>
+<p>教学包未附预生成的仿真结果。源文件和接口已做静态审阅，尚未据此确认完整仿真结果或跨语言数值一致性，实际运行结果应在课程环境中检查。</p>
+<p>模型、地面源和教学用传感谱随包提供。运行资源均位于 <code>data/</code>，使用时保持文件结构与给定接口一致。</p>
+</section>
+<section id="guide-14" class="document-section" aria-labelledby="guide-title-14"><div class="section-heading"><span class="section-number">14</span><h2 id="guide-title-14">函数说明参考</h2></div><p>以下官方文档供查阅函数接口；本教学包实际采用的数组顺序、单位和 Welch 规范以本手册为准。</p>
+<ul>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html">SciPy signal.welch</a></li>
+<li><a href="https://www.mathworks.com/help/matlab/ref/filter.html">MATLAB filter</a></li>
+<li><a href="https://www.mathworks.com/help/matlab/ref/ifft.html">MATLAB ifft</a></li>
+<li><a href="https://www.mathworks.com/help/matlab/ref/readmatrix.html">MATLAB readmatrix</a></li>
+<li><a href="https://www.mathworks.com/help/signal/ref/pwelch.html">MATLAB pwelch</a>：了解 Welch 定义；主示例采用包内明确去均值的 FFT 实现。</li>
+</ul>
+</section></article></div></main>
+<footer class="site-footer"><span>控制课程大作业 · Model-1019</span><div><a href="../">作业说明</a><a href="#top">返回顶部</a></div></footer><p class="sr-only" id="copy-status" role="status" aria-live="polite"></p></body></html>

@@ -6,15 +6,15 @@
   <meta name="theme-color" content="#fafaf8">
   <meta name="description" content="控制课程大作业：以六自由度主动隔振平台 Model-1019 为对象，开展专题文献调研、系统分析、SISO 与 MIMO 控制器设计及闭环性能评价。">
   <title>六自由度主动隔振平台 · 控制课程大作业</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">跳转到作业正文</a>
   <header class="site-header">
-    <a class="wordmark" href="#top" aria-label="控制课程大作业，返回顶部"><span class="brand-mark" aria-hidden="true">m<span>c</span></span><span>控制课程大作业</span></a>
-    <a class="header-download" href="downloads/model1019_coursework_v1.zip" download>下载教学包 <span aria-hidden="true">↓</span></a>
+    <a class="wordmark" href="#top" aria-label="控制课程大作业，返回顶部"><img class="brand-mark" src="assets/brandmark.svg" alt=""><span>控制课程大作业</span></a>
+    <nav class="header-links" aria-label="站点导航"><a href="docs/">使用手册</a><a href="downloads/model1019_coursework_v1.zip" download>下载教学包</a></nav>
   </header>
 
   <main id="main-content">
@@ -24,8 +24,8 @@
       <div class="hero-bottom">
         <div class="hero-description">
           <p>以给定平台模型为被控对象，完成专题文献调研、系统分析、单通道与多变量控制器设计，并通过统一的闭环仿真评价控制性能。</p>
-          <a class="button" href="downloads/model1019_coursework_v1.zip" download>下载作业材料 <span aria-hidden="true">↗</span></a>
-          <span class="download-meta">ZIP · v1.0 · 72 KB</span>
+          <div class="hero-actions"><a class="button" href="downloads/model1019_coursework_v1.zip" download>下载作业材料</a><a class="button button-secondary" href="downloads/model1019.mat" download>仅下载模型 MAT</a></div>
+          <span class="download-meta">ZIP · v1.0 · 51 KB</span>
         </div>
         <dl class="hero-stats" aria-label="模型规模">
           <div><dt>状态</dt><dd>20</dd></div>
@@ -78,10 +78,10 @@
           <div class="section-heading"><span class="section-number">03</span><h2 id="model-title">第二部分 · 被控对象与模型接口</h2></div>
           <p class="section-lead">Model-1019：连续时间线性系统，20 个状态、12 个输入、6 个输出。</p>
           <p>本部分采用 Model-1019 作为控制器设计与闭环仿真的被控对象。模型描述平台在控制命令和基座运动共同作用下的小幅运动响应，并包含测量环节的动态影响。模型已进行固定的输入输出坐标变换，具体数值以教学包中的 <code>data/model1019.mat</code> 为准。</p>
-          <div class="equation" aria-label="状态方程：Z 的时间导数等于 A Z 加 B U。无附加噪声输出等于 C Z 加 D U。">
-            <div><span class="math-variable">Ż</span> = <span class="math-variable">AZ + BU</span></div>
-            <div><span class="math-variable">y</span><sub>clean</sub> = <span class="math-variable">CZ + DU</span></div>
-            <p><span class="math-variable">U</span> 由 6 路控制命令与 6 路基座运动组成</p>
+          <div class="equation" aria-label="状态方程：x 的时间导数等于 A x 加 B u。无附加噪声输出等于 C x 加 D u。">
+            <div><span class="math-variable">ẋ</span> = <span class="math-variable">Ax + Bu</span></div>
+            <div><span class="math-variable">y</span><sub>clean</sub> = <span class="math-variable">Cx + Du</span></div>
+            <p><span class="math-variable">u</span> 由 6 路控制命令与 6 路基座运动组成</p>
           </div>
           <p>矩阵 <code>A</code> 为 20 × 20，<code>B</code> 为 20 × 12，<code>C</code> 为 6 × 20，<code>D</code> 为 6 × 12。<code>B</code> 的前六列对应控制输入，后六列对应基座扰动。使用时完整保留教学包给出的矩阵与接口约定。</p>
 
@@ -142,10 +142,10 @@
 
         <section id="design" class="document-section" aria-labelledby="design-title">
           <div class="section-heading"><span class="section-number">05</span><h2 id="design-title">控制器设计任务</h2></div>
-          <p class="section-lead">依次完成模型分析、FZ → Z 单通道设计和完整 MIMO 系统设计。</p>
+          <p class="section-lead">依次完成模型分析、FZ 至 Z 单通道设计和完整 MIMO 系统设计。</p>
           <ol class="task-list">
             <li><h3>模型分析</h3><p>基于六路控制输入和六路测量输出，分析系统的可控性与可观性。结合极点、零点及通道耦合特性，讨论模型对控制性能的影响与限制。</p><p>可控性分析使用模型中对应控制命令的输入矩阵，即 <code>B</code> 的前六列；后六列为外部基座扰动。报告应说明所用分析方法、主要结果，以及这些结果对后续控制器设计的启示。</p></li>
-            <li><h3>单通道控制器设计：FZ → Z</h3><p>针对 FZ → Z 通道设计反馈控制器，说明设计依据和参数选择过程，绘制灵敏度函数的频率响应，并结合闭环仿真评价稳定性、扰动抑制效果和控制输入代价。</p><p>在教学包接口中，该通道对应第 3 路控制命令 <code>u_z</code> 与第 3 路输出 <code>vz</code>。FZ 为本作业的通道标记，输入按教学包的虚拟命令量使用。</p></li>
+            <li><h3>单通道控制器设计：FZ 至 Z</h3><p>针对 FZ 至 Z 通道设计反馈控制器，说明设计依据和参数选择过程，绘制灵敏度函数的频率响应，并结合闭环仿真评价稳定性、扰动抑制效果和控制输入代价。</p><p>在教学包接口中，该通道对应第 3 路控制命令 <code>u_z</code> 与第 3 路输出 <code>vz</code>。FZ 为本作业的通道标记，输入按教学包的虚拟命令量使用。</p></li>
             <li><h3>多输入多输出控制器设计</h3><p>针对完整 MIMO 系统设计反馈控制器，说明控制结构及其处理多通道耦合的思路，绘制灵敏度矩阵的奇异值曲线，并结合闭环仿真评价多通道抑振效果、耦合影响和控制输入代价。</p><p>报告应将完整系统的稳定性分析与仿真结果联系起来，对不同运动方向的响应变化和设计取舍给出解释。</p></li>
           </ol>
           <div class="note"><strong>设计成果</strong><p>在控制设计报告中呈现模型分析、设计过程、灵敏度曲线、闭环对比结果与结论，并提供可运行代码及复现所需的参数说明。</p></div>
@@ -181,18 +181,19 @@
         <section id="materials" class="document-section" aria-labelledby="materials-title">
           <div class="section-heading"><span class="section-number">07</span><h2 id="materials-title">材料与使用方法</h2></div>
           <p class="section-lead">模型、扰动、噪声和使用示例已打包提供。</p>
-          <div class="download-row"><div><h3>Model-1019 教学包</h3><p>v1.0 · ZIP · 72 KB</p></div><a class="button" href="downloads/model1019_coursework_v1.zip" download>下载完整材料 <span aria-hidden="true">↓</span></a></div>
+          <div class="download-row"><div><h3>Model-1019 教学包</h3><p>v1.0 · ZIP · 51 KB</p></div><a class="button" href="downloads/model1019_coursework_v1.zip" download>下载完整材料</a></div>
+          <div class="download-row model-download"><div><h3>Model-1019 状态空间模型</h3><p>MAT · A、B、C、D 及接口说明 · 6 KB</p></div><a class="button button-secondary" href="downloads/model1019.mat" download>下载模型 MAT</a></div>
           <p>教学包包含连续时间状态空间模型、地面运动源、传感噪声谱及生成器，以及 Python 和 MATLAB 两套使用示例。示例为无控制系统，六路控制命令固定为零，不包含已设计的控制器。</p>
           <div class="table-scroll" role="region" aria-label="教学包文件说明" tabindex="0"><table><thead><tr><th scope="col">内容</th><th scope="col">位置</th><th scope="col">用途</th></tr></thead><tbody>
-            <tr><th scope="row">使用手册</th><td><code>docs/USER_GUIDE.html</code><br><code>docs/USER_GUIDE.md</code></td><td>接口定义、运行方法和频谱分析规范</td></tr>
+            <tr><th scope="row">使用手册</th><td><a href="docs/">在线阅读</a><br><a href="docs/USER_GUIDE.md" download>下载 Markdown</a></td><td>单独提供，不再放入教学包；包含接口定义、运行方法和频谱分析规范</td></tr>
             <tr><th scope="row">模型与信号资源</th><td><code>data/</code></td><td>模型矩阵、地面源和噪声谱</td></tr>
             <tr><th scope="row">Python 示例</th><td><code>python/</code></td><td>无控制仿真与 ASD 绘制</td></tr>
             <tr><th scope="row">MATLAB 示例</th><td><code>matlab/</code></td><td>独立的无控制仿真实现</td></tr>
           </tbody></table></div>
           <h3>开始使用</h3>
-          <p>解压后先阅读 <code>docs/USER_GUIDE.html</code>，确认模型接口、单位约定及运行环境，再从解压目录运行示例。</p>
+          <p>解压后先阅读<a href="docs/">在线使用手册</a>，确认模型接口、单位约定及运行环境，再从解压目录运行示例。</p>
           <div class="command"><div class="command-header"><span>Python</span><button class="copy-button" type="button" data-copy="python python/run_example.py" aria-label="复制 Python 运行命令">复制命令</button></div><pre><code>python python/run_example.py</code></pre></div>
-          <p class="small-text">使用 Python 3.10 或更高版本，并准备 NumPy、SciPy、Matplotlib。具体版本要求见包内使用手册与依赖清单。</p>
+          <p class="small-text">使用 Python 3.10 或更高版本，并准备 NumPy、SciPy、Matplotlib。具体版本要求见在线使用手册与依赖清单。</p>
           <div class="command"><div class="command-header"><span>MATLAB</span><button class="copy-button" type="button" data-copy="addpath(fullfile(pwd,'matlab'));&#10;run_example;" aria-label="复制 MATLAB 运行命令">复制命令</button></div><pre><code>addpath(fullfile(pwd,'matlab'));
 run_example;</code></pre></div>
           <p class="small-text">在 MATLAB 中切换到解压目录后执行。无控制主示例采用基础函数，具体环境要求见使用手册。</p>
@@ -202,7 +203,7 @@ run_example;</code></pre></div>
       </article>
     </div>
   </main>
-  <footer class="site-footer"><span>控制课程大作业 · Model-1019</span><div><a href="https://github.com/pifuyuini/modern-control-project">GitHub 仓库 ↗</a><a href="#top">返回顶部 ↑</a></div></footer>
+  <footer class="site-footer"><span>控制课程大作业 · Model-1019</span><div><a href="docs/">使用手册</a><a href="https://github.com/pifuyuini/modern-control-project">GitHub 仓库</a><a href="#top">返回顶部</a></div></footer>
   <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
 </body>
 </html>
